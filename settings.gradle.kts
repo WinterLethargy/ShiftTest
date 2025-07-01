@@ -23,3 +23,4 @@ rootProject.name = "ShiftTest"
 include(":app")
 include(":core")
 include(":feature:user")
+include(":data:user")

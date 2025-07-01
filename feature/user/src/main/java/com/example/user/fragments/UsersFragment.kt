@@ -6,11 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.user.databinding.PageUsersBinding
 import com.example.user.navigation.UserDetailsRoute
 import com.example.user.viewModels.UsersViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class UsersFragment : Fragment() {
@@ -31,6 +33,9 @@ class UsersFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.button.setOnClickListener {
             findNavController().navigate(UserDetailsRoute(5))
+        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.fetchUsers()
         }
     }
 }
