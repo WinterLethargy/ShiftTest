@@ -7,7 +7,7 @@ interface UserApiService {
     @GET("api/")
     suspend fun getUsers(
         @Query("page") page: Int,
-        @Query("results") results: Int = 2,
+        @Query("results") results: Int = 25,
         @Query("seed") seed: String = "shift"
     ): UserResponse
 }

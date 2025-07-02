@@ -4,9 +4,13 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.example.user.IUserRepository
+import com.example.user.User
 import com.example.user.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -15,10 +19,7 @@ class UsersViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val userRepository : IUserRepository,
 ) : ViewModel() {
-    suspend fun fetchUsers() : Unit{
-        viewModelScope.launch {
-            val users = userRepository.getUsers(1)
-            Log.i("UsersViewModel", users.toString())
-        }
-    }
+    fun getPagingDataFlow(initialOffset: Int?): Flow<PagingData<User>> = userRepository
+        .getUsers(initialOffset)
+        .cachedIn(viewModelScope)
 }

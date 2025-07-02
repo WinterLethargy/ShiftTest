@@ -1,36 +1,38 @@
 package com.example.user
 
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.map
 import com.example.user.api.UserRemoteDataSource
+import com.example.user.database.SHDataBase
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class UserRepository @Inject constructor(
-    private val remoteDataSource: UserRemoteDataSource
+    private val apiService: UserRemoteDataSource,
+    private val repoDatabase: SHDataBase
 ) : IUserRepository {
-    override suspend fun getUsers(page: Int): List<User> {
-        return remoteDataSource.fetchUsers(page).map { apiModel ->
-            User(
-                gender = apiModel.gender,
-                name = User.Name(
-                    title = apiModel.name.title,
-                    first = apiModel.name.first,
-                    last = apiModel.name.last,
-                ),
-                location = User.Location(
-                    city = apiModel.location.city,
-                    country = apiModel.location.country
-                ),
-                email = apiModel.email,
-                dob = User.Dob(
-                    date = apiModel.dob.date,
-                    age = apiModel.dob.age,
-                ),
-                phone = apiModel.phone,
-                picture = User.Picture(
-                    large = apiModel.picture.large,
-                    medium = apiModel.picture.medium,
-                    thumbnail = apiModel.picture.thumbnail
-                )
-            )
+    override fun getUsers(initialOffset: Int?): Flow<PagingData<User>> {
+        val pagingSourceFactory = { repoDatabase.usersDao().users() }
+
+        @OptIn(ExperimentalPagingApi::class)
+        return Pager(
+            config = PagingConfig(
+                pageSize = 20,
+                enablePlaceholders = false,
+            ),
+            remoteMediator = UserRemoteMediator(
+                apiService,
+                repoDatabase
+            ),
+            initialKey = initialOffset,
+            pagingSourceFactory = pagingSourceFactory
+        ).flow
+         .map { pagingData ->
+             pagingData.map { it.toBusinessModel() }
         }
     }
 }

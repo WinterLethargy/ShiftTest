@@ -1,6 +1,7 @@
 package com.example.user
 
 data class User(
+    val id: Long,
     val gender: String,
     val name: Name,
     val location: Location,
