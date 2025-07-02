@@ -15,8 +15,15 @@ class UserRepository @Inject constructor(
     private val apiService: UserRemoteDataSource,
     private val repoDatabase: SHDataBase
 ) : IUserRepository {
-    override fun getUsers(initialOffset: Int?): Flow<PagingData<User>> {
+    override suspend fun getUsers(firstUserId: Long?): Flow<PagingData<User>> {
         val pagingSourceFactory = { repoDatabase.usersDao().usersPagingSource() }
+
+        val initialOffset = if(firstUserId == null){
+            null
+        }
+        else{
+            repoDatabase.usersDao().userOffset(firstUserId)
+        }
 
         @OptIn(ExperimentalPagingApi::class)
         return Pager(

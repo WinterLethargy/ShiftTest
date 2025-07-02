@@ -7,9 +7,14 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 class UserViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    var user: User? = null
+        private set
+        get
+
     private val name: TextView = view.findViewById(R.id.name)
 
     fun bind(user: User?) {
+        this.user = user
         if(user == null)
             return
 

@@ -14,6 +14,8 @@ class UserAdapter : PagingDataAdapter<User, UserViewHolder>(UIMODEL_COMPARATOR) 
         holder.bind(user)
     }
 
+
+
     companion object {
         private val UIMODEL_COMPARATOR = object : DiffUtil.ItemCallback<User>() {
             override fun areItemsTheSame(oldItem: User, newItem: User): Boolean {

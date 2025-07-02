@@ -6,5 +6,5 @@ import com.example.user.database.UsersDbModel
 import kotlinx.coroutines.flow.Flow
 
 interface IUserRepository {
-    fun getUsers(initialOffset: Int?): Flow<PagingData<User>>
+    suspend fun getUsers(firstUserId: Long?): Flow<PagingData<User>>
 }

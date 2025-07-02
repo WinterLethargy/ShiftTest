@@ -13,6 +13,9 @@ interface UsersDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(repos: List<UsersDbModel>) : List<Long>
 
+    @Query("SELECT COUNT(*) FROM users WHERE id < :id ORDER BY id")
+    suspend fun userOffset(id: Long) : Int
+
     @Query("SELECT * FROM users ORDER BY id")
     fun usersPagingSource(): PagingSource<Int, UsersDbModel>
 

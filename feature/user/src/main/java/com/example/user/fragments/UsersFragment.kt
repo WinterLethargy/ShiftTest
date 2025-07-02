@@ -1,5 +1,6 @@
 package com.example.user.fragments
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,20 +10,28 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.paging.CombinedLoadStates
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.core.di.Dispatcher
 import com.example.user.UserAdapter
 import com.example.user.UserViewHolder
 import com.example.user.databinding.PageUsersBinding
 import com.example.user.viewModels.UsersViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
 class UsersFragment : Fragment() {
     private val viewModel: UsersViewModel by viewModels()
-    private var firstVisibleUserAdapterPosition: Int? = null
+    private var firstVisibleUserId: Long? = null
 
     private var _binding: PageUsersBinding? = null
     private val binding get() = _binding!!
@@ -32,7 +41,7 @@ class UsersFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = PageUsersBinding.inflate(inflater, container, false)
-        firstVisibleUserAdapterPosition = savedInstanceState?.getInt(FIRST_VISIBLE_ADAPTER_POSITION)
+        firstVisibleUserId = savedInstanceState?.getLong(FIRST_VISIBLE_USER_ID)
         return binding.root
     }
 
@@ -40,9 +49,10 @@ class UsersFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val adapter = UserAdapter()
         binding.list.adapter = adapter
+        binding.list.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.getPagingDataFlow(firstVisibleUserAdapterPosition).collectLatest { pagingData ->
+                viewModel.getPagingDataFlow(firstVisibleUserId).collectLatest { pagingData ->
                     adapter.submitData(pagingData)
                 }
             }
@@ -70,12 +80,12 @@ class UsersFragment : Fragment() {
             return
 
         recyclerView.findViewHolderForLayoutPosition(visibleLayoutPosition)
-            ?.itemView
-            ?.let { recyclerView.getChildAdapterPosition(it) }
-            ?.let { outState.putInt(FIRST_VISIBLE_ADAPTER_POSITION, it) }
+            ?.let { it as? UserViewHolder }
+            ?.user
+            ?.let { outState.putLong(FIRST_VISIBLE_USER_ID, it.id) }
     }
 
     companion object{
-        const val FIRST_VISIBLE_ADAPTER_POSITION = "FIRST_VISIBLE_ADAPTER_POSITION"
+        const val FIRST_VISIBLE_USER_ID = "FIRST_VISIBLE_USER_ID"
     }
 }

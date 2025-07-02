@@ -19,7 +19,7 @@ class UsersViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val userRepository : IUserRepository,
 ) : ViewModel() {
-    fun getPagingDataFlow(initialOffset: Int?): Flow<PagingData<User>> = userRepository
-        .getUsers(initialOffset)
+    suspend fun getPagingDataFlow(firstUserId: Long?): Flow<PagingData<User>> = userRepository
+        .getUsers(firstUserId)
         .cachedIn(viewModelScope)
 }
