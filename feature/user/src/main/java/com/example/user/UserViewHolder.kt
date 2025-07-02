@@ -13,7 +13,7 @@ class UserViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         if(user == null)
             return
 
-        name.text = "${user.name.title} ${user.name.first} ${user.name.last}"
+        name.text = "${user.id}. ${user.name.title} ${user.name.first} ${user.name.last}"
     }
 
     companion object{

@@ -22,9 +22,12 @@ class UserRemoteMediator (
     private val repoDatabase: SHDataBase
 ) : RemoteMediator<Int, UsersDbModel>() {
 
-    override suspend fun initialize(): InitializeAction {
-        return InitializeAction.LAUNCH_INITIAL_REFRESH
-    }
+    override suspend fun initialize() =
+       if(repoDatabase.usersDao().usersExist())
+           InitializeAction.SKIP_INITIAL_REFRESH
+       else
+           InitializeAction.LAUNCH_INITIAL_REFRESH
+
 
     override suspend fun load(loadType: LoadType, state: PagingState<Int, UsersDbModel>): MediatorResult {
         val page = when (loadType) {

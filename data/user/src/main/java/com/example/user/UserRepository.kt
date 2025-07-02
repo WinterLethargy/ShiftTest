@@ -16,7 +16,7 @@ class UserRepository @Inject constructor(
     private val repoDatabase: SHDataBase
 ) : IUserRepository {
     override fun getUsers(initialOffset: Int?): Flow<PagingData<User>> {
-        val pagingSourceFactory = { repoDatabase.usersDao().users() }
+        val pagingSourceFactory = { repoDatabase.usersDao().usersPagingSource() }
 
         @OptIn(ExperimentalPagingApi::class)
         return Pager(
