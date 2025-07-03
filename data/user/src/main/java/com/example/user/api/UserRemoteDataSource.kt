@@ -6,7 +6,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class UserRemoteDataSource @Inject constructor(
+internal class UserRemoteDataSource @Inject constructor(
     private val api: UserApiService,
     @Dispatcher(SHDispatchers.IO)
     private val dispatcher: CoroutineDispatcher,

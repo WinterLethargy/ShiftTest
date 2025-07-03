@@ -4,14 +4,17 @@ import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 
-class UserAdapter : PagingDataAdapter<User, UserViewHolder>(UIMODEL_COMPARATOR) {
+class UserAdapter(
+    val tapAction: (Long) -> Unit
+) : PagingDataAdapter<User, UserViewHolder>(UIMODEL_COMPARATOR) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {
-        return UserViewHolder.create(parent)
+        return UserViewHolder.create(parent,tapAction)
     }
 
     override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
-        val user = getItem(position)
-        holder.bind(user)
+        getItem(position)?.let{
+            holder.bind(it)
+        }
     }
 
 

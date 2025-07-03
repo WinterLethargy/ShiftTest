@@ -4,9 +4,10 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.example.user.database.models.RemoteKeysDbModel
 
 @Dao
-interface RemoteKeysDao {
+internal interface RemoteKeysDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(remoteKey: List<RemoteKeysDbModel>)

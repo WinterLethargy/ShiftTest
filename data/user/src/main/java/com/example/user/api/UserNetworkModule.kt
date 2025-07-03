@@ -10,7 +10,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object UserNetworkModule {
+internal object UserNetworkModule {
 
     @Provides
     @Singleton

@@ -1,3 +1,9 @@
 <resources>
     <string name="users_label">Пользователи</string>
+    <string name="refresh">Обновить</string>
+    <string name="gender">Пол</string>
+    <string name="phone">Телефон</string>
+    <string name="email">Email</string>
+    <string name="age">Возраст</string>
+    <string name="location">Расположение</string>
 </resources>

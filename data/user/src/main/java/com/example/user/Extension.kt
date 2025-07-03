@@ -1,9 +1,9 @@
 package com.example.user
 
 import com.example.user.api.UserApiModel
-import com.example.user.database.UsersDbModel
+import com.example.user.database.models.UsersDbModel
 
-fun UserApiModel.toDbModel(): UsersDbModel = UsersDbModel(
+internal fun UserApiModel.toDbModel(): UsersDbModel = UsersDbModel(
     id = null,
     gender = gender,
     title = name.title,
@@ -11,6 +11,8 @@ fun UserApiModel.toDbModel(): UsersDbModel = UsersDbModel(
     last = name.last,
     city = location.city,
     country = location.country,
+    latitude = location.coordinates.latitude,
+    longitude = location.coordinates.longitude,
     email = email,
     date = dob.date,
     age = dob.age,
@@ -20,7 +22,7 @@ fun UserApiModel.toDbModel(): UsersDbModel = UsersDbModel(
     thumbnailPic = picture.thumbnail
 )
 
-fun UsersDbModel.toBusinessModel(): User = User(
+internal fun UsersDbModel.toBusinessModel(): User = User(
     id = id ?: 0,
     gender = gender,
     name = User.Name(
@@ -30,7 +32,11 @@ fun UsersDbModel.toBusinessModel(): User = User(
     ),
     location = User.Location(
         city = city,
-        country = country
+        country = country,
+        coordinates = User.Location.Coordinates(
+            latitude = latitude,
+            longitude = longitude,
+        )
     ),
     email = email,
     dob = User.Dob(

@@ -3,7 +3,7 @@ package com.example.user.api
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-interface UserApiService {
+internal interface UserApiService {
     @GET("api/")
     suspend fun getUsers(
         @Query("page") page: Int,

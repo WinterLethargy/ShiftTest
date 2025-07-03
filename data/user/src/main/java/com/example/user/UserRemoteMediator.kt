@@ -6,24 +6,28 @@ import androidx.paging.RemoteMediator
 import androidx.paging.ExperimentalPagingApi
 import androidx.room.withTransaction
 import com.example.user.api.UserApiModel
-import com.example.user.database.RemoteKeysDbModel
+import com.example.user.database.models.RemoteKeysDbModel
 import com.example.user.database.SHDataBase
-import com.example.user.database.UsersDbModel
+import com.example.user.database.models.UsersDbModel
 import com.google.firebase.crashlytics.buildtools.reloc.org.apache.http.HttpException
 import java.io.IOException
 import com.example.user.api.UserRemoteDataSource
+import com.example.user.database.UserDataBaseDataSource
+import com.example.user.database.UserRemoteKeysDataBaseDataSource
 
 private const val START_PAGE_INDEX = 0
 private const val END_PAGE_INDEX = 10
 
 @OptIn(ExperimentalPagingApi::class)
-class UserRemoteMediator (
+internal class UserRemoteMediator (
     private val apiService: UserRemoteDataSource,
-    private val repoDatabase: SHDataBase
+    private val userDBDataStore: UserDataBaseDataSource,
+    private val remoteKeyDBDataStore: UserRemoteKeysDataBaseDataSource,
+    private val database: SHDataBase,
 ) : RemoteMediator<Int, UsersDbModel>() {
 
     override suspend fun initialize() =
-       if(repoDatabase.usersDao().usersExist())
+       if(userDBDataStore.usersExist())
            InitializeAction.SKIP_INITIAL_REFRESH
        else
            InitializeAction.LAUNCH_INITIAL_REFRESH
@@ -56,21 +60,21 @@ class UserRemoteMediator (
         try {
             val users = apiService.fetchUsers(page)
             val endOfPaginationReached = page == END_PAGE_INDEX
-            repoDatabase.withTransaction {
+            database.withTransaction {
                 if (loadType == LoadType.REFRESH) {
-                    repoDatabase.remoteKeysDao().clearRemoteKeys()
-                    repoDatabase.usersDao().clearUsers()
+                    remoteKeyDBDataStore.clearRemoteKeys()
+                    userDBDataStore.clearUsers()
                 }
                 val prevKey = if (page == START_PAGE_INDEX) null else page - 1
                 val nextKey = if (endOfPaginationReached) null else page + 1
 
                 val dbModels = users.map(UserApiModel::toDbModel)
-                var ids = repoDatabase.usersDao().insertAll(dbModels)
+                var ids = userDBDataStore.insertAll(dbModels)
                 val dbModelsWithIds = dbModels.zip(ids) { db, id -> db.copy(id = id) }
                 val keys = dbModelsWithIds.map {
                     RemoteKeysDbModel(userId = it.id!!, prevKey = prevKey, nextKey = nextKey)
                 }
-                repoDatabase.remoteKeysDao().insertAll(keys)
+                remoteKeyDBDataStore.insertAll(keys)
             }
             return MediatorResult.Success(endOfPaginationReached = endOfPaginationReached)
         } catch (exception: IOException) {
@@ -83,14 +87,14 @@ class UserRemoteMediator (
     private suspend fun getRemoteKeyForLastItem(state: PagingState<Int, UsersDbModel>): RemoteKeysDbModel? {
         return state.pages.lastOrNull() { it.data.isNotEmpty() }?.data?.lastOrNull()
             ?.let { user ->
-                repoDatabase.remoteKeysDao().remoteKeysUserId(user.id!!)
+                remoteKeyDBDataStore.remoteKeysUserId(user.id!!)
             }
     }
 
     private suspend fun getRemoteKeyForFirstItem(state: PagingState<Int, UsersDbModel>): RemoteKeysDbModel? {
         return state.pages.firstOrNull { it.data.isNotEmpty() }?.data?.firstOrNull()
             ?.let { repo ->
-                repoDatabase.remoteKeysDao().remoteKeysUserId(repo.id!!)
+                remoteKeyDBDataStore.remoteKeysUserId(repo.id!!)
             }
     }
 
@@ -99,7 +103,7 @@ class UserRemoteMediator (
     ): RemoteKeysDbModel? {
         return state.anchorPosition?.let { position ->
             state.closestItemToPosition(position)?.id?.let { userId ->
-                repoDatabase.remoteKeysDao().remoteKeysUserId(userId)
+                remoteKeyDBDataStore.remoteKeysUserId(userId)
             }
         }
     }

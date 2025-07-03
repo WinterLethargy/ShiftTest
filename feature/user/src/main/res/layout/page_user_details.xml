@@ -1,14 +1,238 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:text="ТЕКСТ ПРО ЛОРЕМ"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
-</androidx.constraintlayout.widget.ConstraintLayout>
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@android:color/white">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/content_bottom"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_end="@dimen/content_padding" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/content_start"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="@dimen/content_padding" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/content_end"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            app:layout_constraintGuide_end="@dimen/content_padding" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/center"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.5" />
+        
+        <ImageView
+            android:id="@+id/image"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintDimensionRatio="1:1"
+            android:background="@android:color/white"/>
+        
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="@id/content_start"
+            app:layout_constraintTop_toBottomOf="@id/image"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="5dp"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:textColor="@android:color/black"
+            tools:text="Mr. Anderson Mr. Anderson"/>
+
+        <TextView
+            android:id="@+id/age_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:minHeight="30dp"
+            app:layout_constraintStart_toStartOf="@id/content_start"
+            app:layout_constraintTop_toBottomOf="@id/name"
+            app:layout_constraintEnd_toEndOf="@id/center"
+            app:layout_constraintBottom_toBottomOf="@id/barrier_age"
+            android:layout_marginTop="5dp"
+            android:gravity="center_vertical"
+            android:text="@string/age"
+            android:textColor="@android:color/black"/>
+
+        <TextView
+            android:id="@+id/age"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:minHeight="30dp"
+            app:layout_constraintStart_toStartOf="@id/center"
+            app:layout_constraintTop_toBottomOf="@id/name"
+            app:layout_constraintEnd_toEndOf="@id/content_end"
+            app:layout_constraintBottom_toBottomOf="@id/barrier_age"
+            android:layout_marginTop="5dp"
+            android:gravity="center"
+            tools:text="Возраст"
+            android:textColor="@android:color/black"/>
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/barrier_age"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="bottom"
+            app:constraint_referenced_ids="age_title,age" />
+        
+        <TextView
+            android:id="@+id/gender_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:minHeight="30dp"
+            app:layout_constraintStart_toStartOf="@id/content_start"
+            app:layout_constraintTop_toBottomOf="@id/barrier_age"
+            app:layout_constraintEnd_toEndOf="@id/center"
+            app:layout_constraintBottom_toBottomOf="@id/barrier_gender"
+            android:layout_marginTop="5dp"
+            android:gravity="center_vertical"
+            android:text="@string/gender"
+            android:textColor="@android:color/black"/>
+
+        <TextView
+            android:id="@+id/gender"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:minHeight="30dp"
+            app:layout_constraintStart_toStartOf="@id/center"
+            app:layout_constraintTop_toBottomOf="@id/barrier_age"
+            app:layout_constraintEnd_toEndOf="@id/content_end"
+            app:layout_constraintBottom_toBottomOf="@id/barrier_gender"
+            android:layout_marginTop="5dp"
+            android:gravity="center"
+            tools:text="Пол Пол Пол Пол Пол Пол Пол Пол Пол Пол Пол Пол Пол Пол Пол Пол Пол "
+            android:textColor="@android:color/black"/>
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/barrier_gender"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="bottom"
+            app:constraint_referenced_ids="gender_title,gender" />
+
+        <TextView
+            android:id="@+id/email_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:minHeight="30dp"
+            app:layout_constraintStart_toStartOf="@id/content_start"
+            app:layout_constraintTop_toBottomOf="@id/barrier_gender"
+            app:layout_constraintEnd_toEndOf="@id/center"
+            app:layout_constraintBottom_toBottomOf="@id/barrier_email"
+            android:layout_marginTop="5dp"
+            android:gravity="center_vertical"
+            android:text="@string/email"
+            android:textColor="@android:color/black"/>
+
+        <TextView
+            android:id="@+id/email"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:minHeight="30dp"
+            app:layout_constraintStart_toStartOf="@id/center"
+            app:layout_constraintTop_toBottomOf="@id/barrier_gender"
+            app:layout_constraintEnd_toEndOf="@id/content_end"
+            app:layout_constraintBottom_toBottomOf="@id/barrier_email"
+            android:layout_marginTop="5dp"
+            android:gravity="center"
+            tools:text="Email"
+            android:textColor="@android:color/black"/>
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/barrier_email"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="bottom"
+            app:constraint_referenced_ids="email_title,email" />
+
+        <TextView
+            android:id="@+id/phone_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:minHeight="30dp"
+            app:layout_constraintStart_toStartOf="@id/content_start"
+            app:layout_constraintTop_toBottomOf="@id/barrier_email"
+            app:layout_constraintEnd_toEndOf="@id/center"
+            app:layout_constraintBottom_toBottomOf="@id/barrier_phone"
+            android:layout_marginTop="5dp"
+            android:gravity="center_vertical"
+            android:text="@string/phone"
+            android:textColor="@android:color/black"/>
+
+        <TextView
+            android:id="@+id/phone"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:minHeight="30dp"
+            app:layout_constraintStart_toStartOf="@id/center"
+            app:layout_constraintTop_toBottomOf="@id/barrier_email"
+            app:layout_constraintEnd_toEndOf="@id/content_end"
+            app:layout_constraintBottom_toBottomOf="@id/barrier_phone"
+            android:layout_marginTop="5dp"
+            android:gravity="center"
+            tools:text="Телефон"
+            android:textColor="@android:color/black"/>
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/barrier_phone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="bottom"
+            app:constraint_referenced_ids="email_title,email" />
+
+        <TextView
+            android:id="@+id/location_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:minHeight="30dp"
+            app:layout_constraintStart_toStartOf="@id/content_start"
+            app:layout_constraintTop_toBottomOf="@id/barrier_phone"
+            app:layout_constraintEnd_toEndOf="@id/center"
+            app:layout_constraintBottom_toBottomOf="@id/barrier_location"
+            android:layout_marginTop="5dp"
+            android:gravity="center_vertical"
+            android:text="@string/location"
+            android:textColor="@android:color/black"/>
+
+        <TextView
+            android:id="@+id/location"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:minHeight="30dp"
+            app:layout_constraintStart_toStartOf="@id/center"
+            app:layout_constraintTop_toBottomOf="@id/barrier_phone"
+            app:layout_constraintEnd_toEndOf="@id/content_end"
+            app:layout_constraintBottom_toBottomOf="@id/barrier_location"
+            android:layout_marginTop="5dp"
+            android:gravity="center"
+            tools:text="Местоположение"
+            android:textColor="@android:color/black"/>
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/barrier_location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="bottom"
+            app:constraint_referenced_ids="location_title,location" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>

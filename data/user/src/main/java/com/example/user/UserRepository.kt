@@ -7,22 +7,26 @@ import androidx.paging.PagingData
 import androidx.paging.map
 import com.example.user.api.UserRemoteDataSource
 import com.example.user.database.SHDataBase
+import com.example.user.database.UserDataBaseDataSource
+import com.example.user.database.UserRemoteKeysDataBaseDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-class UserRepository @Inject constructor(
+internal class UserRepository @Inject constructor(
     private val apiService: UserRemoteDataSource,
-    private val repoDatabase: SHDataBase
+    private val userDBDataStore: UserDataBaseDataSource,
+    private val remoteKeyDBDataStore: UserRemoteKeysDataBaseDataSource,
+    private val dataBase: SHDataBase,
 ) : IUserRepository {
     override suspend fun getUsers(firstUserId: Long?): Flow<PagingData<User>> {
-        val pagingSourceFactory = { repoDatabase.usersDao().usersPagingSource() }
+        val pagingSourceFactory = { userDBDataStore.usersPagingSource() }
 
         val initialOffset = if(firstUserId == null){
             null
         }
         else{
-            repoDatabase.usersDao().userOffset(firstUserId)
+            userDBDataStore.userOffset(firstUserId)
         }
 
         @OptIn(ExperimentalPagingApi::class)
@@ -33,13 +37,21 @@ class UserRepository @Inject constructor(
             ),
             remoteMediator = UserRemoteMediator(
                 apiService,
-                repoDatabase
+                userDBDataStore,
+                remoteKeyDBDataStore,
+                dataBase
             ),
             initialKey = initialOffset,
             pagingSourceFactory = pagingSourceFactory
         ).flow
          .map { pagingData ->
              pagingData.map { it.toBusinessModel() }
+        }
+    }
+
+    override fun getUser(id: Long): Flow<User?>{
+        return userDBDataStore.getUser(id).map{
+            it?.let{ it.toBusinessModel() }
         }
     }
 }

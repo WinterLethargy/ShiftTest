@@ -4,13 +4,15 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.example.user.database.models.RemoteKeysDbModel
+import com.example.user.database.models.UsersDbModel
 
 @Database(
     entities = [UsersDbModel::class, RemoteKeysDbModel::class],
     version = 2,
     exportSchema = false
 )
-abstract class SHDataBase : RoomDatabase() {
+internal abstract class SHDataBase : RoomDatabase() {
 
     abstract fun usersDao(): UsersDao
     abstract fun remoteKeysDao(): RemoteKeysDao
