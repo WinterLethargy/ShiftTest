@@ -117,7 +117,9 @@ class UsersFragment : Fragment() {
     }
 
     private fun refresh(){
+        binding.list.scrollToPosition(0)
         adapter?.refresh()
+
     }
 
     override fun onDestroy() {

@@ -1,5 +1,6 @@
 package com.example.user
 
+import android.util.Log
 import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
@@ -32,33 +33,32 @@ internal class UserRemoteMediator (
        else
            InitializeAction.LAUNCH_INITIAL_REFRESH
 
-
     override suspend fun load(loadType: LoadType, state: PagingState<Int, UsersDbModel>): MediatorResult {
         val page = when (loadType) {
             LoadType.REFRESH -> {
-                val remoteKeys = getRemoteKeyClosestToCurrentPosition(state)
-                remoteKeys?.nextKey?.minus(1) ?: START_PAGE_INDEX
+                Log.d("LOAD_USER_PAGE", "LoadType.REFRESH")
+                START_PAGE_INDEX
             }
             LoadType.PREPEND -> {
-                val remoteKeys = getRemoteKeyForFirstItem(state)
-                val prevKey = remoteKeys?.prevKey
-                if (prevKey == null) {
-                    return MediatorResult.Success(endOfPaginationReached = remoteKeys != null)
-                }
-                prevKey
+                Log.d("LOAD_USER_PAGE", "LoadType.PREPEND")
+                return MediatorResult.Success(endOfPaginationReached = true)
             }
             LoadType.APPEND -> {
+
                 val remoteKeys = getRemoteKeyForLastItem(state)
                 val nextKey = remoteKeys?.nextKey
                 if (nextKey == null) {
+                    Log.d("LOAD_USER_PAGE", "LoadType.APPEND next key - null, remoteKeys - $remoteKeys")
                     return MediatorResult.Success(endOfPaginationReached = remoteKeys != null)
                 }
+                Log.d("LOAD_USER_PAGE", "LoadType.APPEND next key")
                 nextKey
             }
         }
 
         try {
             val users = apiService.fetchUsers(page)
+            Log.d("LOAD_USER_PAGE", "Загрузили страницу $page")
             val endOfPaginationReached = page == END_PAGE_INDEX
             database.withTransaction {
                 if (loadType == LoadType.REFRESH) {
@@ -78,8 +78,10 @@ internal class UserRemoteMediator (
             }
             return MediatorResult.Success(endOfPaginationReached = endOfPaginationReached)
         } catch (exception: IOException) {
+            Log.e("LOAD_USER_PAGE", "ошибка при загрузке страницы", exception)
             return MediatorResult.Error(exception)
         } catch (exception: HttpException) {
+            Log.e("LOAD_USER_PAGE", "ошибка при загрузке страницы", exception)
             return MediatorResult.Error(exception)
         }
     }
@@ -89,20 +91,5 @@ internal class UserRemoteMediator (
             ?.let { user ->
                 remoteKeyDBDataStore.remoteKeysUserId(user.id!!)
             }
-    }
-
-    private suspend fun getRemoteKeyForFirstItem(state: PagingState<Int, UsersDbModel>): RemoteKeysDbModel? {
-        return state.pages.firstOrNull { it.data.isNotEmpty() }?.data?.firstOrNull()
-            ?.let { user ->
-                remoteKeyDBDataStore.remoteKeysUserId(user.id!!)
-            }
-    }
-
-    private suspend fun getRemoteKeyClosestToCurrentPosition(state: PagingState<Int, UsersDbModel>): RemoteKeysDbModel? {
-        return state.anchorPosition?.let { position ->
-            state.closestItemToPosition(position)?.id?.let { userId ->
-                remoteKeyDBDataStore.remoteKeysUserId(userId)
-            }
-        }
     }
 }
