@@ -85,7 +85,7 @@ internal class UserRemoteMediator (
     }
 
     private suspend fun getRemoteKeyForLastItem(state: PagingState<Int, UsersDbModel>): RemoteKeysDbModel? {
-        return state.pages.lastOrNull() { it.data.isNotEmpty() }?.data?.lastOrNull()
+        return state.pages.lastOrNull { it.data.isNotEmpty() }?.data?.lastOrNull()
             ?.let { user ->
                 remoteKeyDBDataStore.remoteKeysUserId(user.id!!)
             }
@@ -93,14 +93,12 @@ internal class UserRemoteMediator (
 
     private suspend fun getRemoteKeyForFirstItem(state: PagingState<Int, UsersDbModel>): RemoteKeysDbModel? {
         return state.pages.firstOrNull { it.data.isNotEmpty() }?.data?.firstOrNull()
-            ?.let { repo ->
-                remoteKeyDBDataStore.remoteKeysUserId(repo.id!!)
+            ?.let { user ->
+                remoteKeyDBDataStore.remoteKeysUserId(user.id!!)
             }
     }
 
-    private suspend fun getRemoteKeyClosestToCurrentPosition(
-        state: PagingState<Int, UsersDbModel>
-    ): RemoteKeysDbModel? {
+    private suspend fun getRemoteKeyClosestToCurrentPosition(state: PagingState<Int, UsersDbModel>): RemoteKeysDbModel? {
         return state.anchorPosition?.let { position ->
             state.closestItemToPosition(position)?.id?.let { userId ->
                 remoteKeyDBDataStore.remoteKeysUserId(userId)
