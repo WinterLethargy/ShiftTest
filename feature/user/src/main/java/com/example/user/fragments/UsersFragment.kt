@@ -1,10 +1,15 @@
 package com.example.user.fragments
 
+import android.Manifest
 import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.RequiresPermission
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -25,6 +30,7 @@ import com.example.user.navigation.UserDetailsRoute
 import com.example.user.viewModels.UsersViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filter
@@ -36,6 +42,7 @@ import kotlinx.coroutines.withContext
 class UsersFragment : Fragment() {
     private val viewModel: UsersViewModel by viewModels()
     private var firstVisibleUserId: Long? = null
+    private var needRefreshedScroll: Boolean = false
 
     private var _binding: PageUsersBinding? = null
     private val binding get() = _binding!!
@@ -117,9 +124,24 @@ class UsersFragment : Fragment() {
     }
 
     private fun refresh(){
-        binding.list.scrollToPosition(0)
-        adapter?.refresh()
+        val localAdapter = adapter
+        if(localAdapter == null)
+            return
 
+        if(!needRefreshedScroll){
+            viewLifecycleOwner.lifecycleScope.launch {
+                localAdapter.loadStateFlow.collect{
+                    if (needRefreshedScroll && it.refresh is LoadState.NotLoading){
+                        binding.list.scrollToPosition(0)
+                        needRefreshedScroll = false
+                        cancel()
+                    }
+                }
+            }
+        }
+
+        localAdapter.refresh()
+        needRefreshedScroll = true
     }
 
     override fun onDestroy() {
